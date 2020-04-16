@@ -1,12 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:personal_expenses/widgets/user_transactions.dart';
 
-class NewTransaction extends StatelessWidget {
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
+class NewTransaction extends StatefulWidget {
   final Function addNewTransaction;
 
   NewTransaction(this.addNewTransaction);
+
+  @override
+  _NewTransactionState createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
+  final titleController = TextEditingController();
+
+  final amountController = TextEditingController();
+
+  void submitData() {
+    final enteredTitle = titleController.text;
+    final enteredAmount = double.parse(amountController.text);
+
+    if (enteredTitle.isEmpty || enteredAmount <= 0) {
+      return;
+    }
+    // widget references the above widget
+    widget.addNewTransaction(enteredTitle, enteredAmount);
+
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,27 +33,29 @@ class NewTransaction extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
-          TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Enter new purchase'
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: 'Enter new purchase'
+              ),
+              controller: titleController,
+              onSubmitted: (_) => submitData(),
             ),
-            controller: titleController,
           ),
-          Container(
-            padding: EdgeInsets.only(bottom: 10.0)
-          ),
-          TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Enter new purchase amount'
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: 'Enter new purchase amount'
+              ),
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              onSubmitted: (_) => submitData(),
             ),
-            controller: amountController,
           ),
           FlatButton(
-            onPressed: () {
-              addNewTransaction(titleController.text, double.parse(amountController.text));
-            },
+            onPressed: submitData,
             textColor: Colors.indigo,
             child: Text('Add Transaction')
           )
