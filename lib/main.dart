@@ -16,18 +16,23 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         accentColor: Colors.pinkAccent,
         fontFamily: 'Quicksand',
-        textTheme: ThemeData.light().textTheme.copyWith(
-                title: TextStyle(
+        textTheme: TextTheme(
+            title: TextStyle(
               fontFamily: 'OpenSans',
               fontWeight: FontWeight.bold,
               fontSize: 18,
+            ),
+            button: TextStyle(
+              color: Colors.white,
             )),
         appBarTheme: AppBarTheme(
-            textTheme: ThemeData.light().textTheme.copyWith(
-                    title: TextStyle(
+          textTheme: ThemeData.light().textTheme.copyWith(
+                title: TextStyle(
                   fontFamily: 'OpenSans',
                   fontSize: 20,
-                ))),
+                ),
+              ),
+        ),
       ),
       home: MyHomePage(),
     );
@@ -42,15 +47,21 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [];
 
-  void _addNewTransaction(String txTitle, double txAmount) {
+  void _addNewTransaction(String txTitle, double txAmount, DateTime date) {
     final newTx = Transaction(
       title: txTitle,
       amount: txAmount,
-      date: DateTime.now(),
+      date: date,
       id: DateTime.now().toString(),
     );
 
     setState(() => {_transactions.add(newTx)});
+  }
+
+  void _deleteTransaction(String id) {
+    setState(() {
+      _transactions.removeWhere((tx) => tx.id == id);
+    });
   }
 
   List<Transaction> get _returnRecentTransactions {
@@ -60,40 +71,43 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _startAddNewTransaction(BuildContext ctx) {
     showModalBottomSheet(
-        context: ctx,
-        builder: (_) {
-          return NewTransaction(_addNewTransaction);
-        });
+      context: ctx,
+      builder: (_) {
+        return GestureDetector(
+          onTap: () {},
+          child: NewTransaction(_addNewTransaction),
+          behavior: HitTestBehavior.opaque,
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Personal Expenses'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () => _startAddNewTransaction(context),
-            )
-          ],
-        ),
-        body: Column(
-          children: <Widget>[
-            Container(
-              width: double.infinity,
-              child: Card(
-                child: Chart(_returnRecentTransactions),
-                elevation: 5,
-              ),
-            ),
-            TransactionList(_transactions),
-          ],
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          onPressed: () => _startAddNewTransaction(context),
-        ));
+      appBar: AppBar(
+        title: Text('Personal Expenses'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () => _startAddNewTransaction(context),
+          )
+        ],
+      ),
+      body: Column(
+        children: <Widget>[
+          Container(
+            width: double.infinity,
+            child: Chart(_returnRecentTransactions),
+          ),
+          TransactionList(_transactions, _deleteTransaction),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => _startAddNewTransaction(context),
+      ),
+    );
   }
 }

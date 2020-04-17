@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:personal_expenses/models/transaction.dart';
 import '../models/transaction.dart';
 import 'package:intl/intl.dart';
+import './chart_bar.dart';
 
 class Chart extends StatelessWidget {
   final List<Transaction> recentTransactions;
@@ -17,8 +18,10 @@ class Chart extends StatelessWidget {
         int txDay = recentTransactions[i].date.day;
         int txMonth = recentTransactions[i].date.month;
         int txYear = recentTransactions[i].date.year;
-    
-        if (txDay == weekDay.day && txMonth == weekDay.month && txYear == weekDay.year) {
+
+        if (txDay == weekDay.day &&
+            txMonth == weekDay.month &&
+            txYear == weekDay.year) {
           totalSum += recentTransactions[i].amount;
         }
       }
@@ -27,22 +30,41 @@ class Chart extends StatelessWidget {
         'day': DateFormat.E().format(weekDay).substring(0, 1),
         'amount': totalSum
       };
+    }).reversed.toList();
+  }
+
+  double get totalSpending {
+    return groupedTransactionValues.fold(0.0, (sum, item) {
+      return sum + item['amount'];
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    print(groupedTransactionValues);
     return Card(
       elevation: 6,
       margin: EdgeInsets.all(20),
-      child: Row(
-        children: <Widget>[
-          ...groupedTransactionValues.map((data) {
-            return Text('${data['day']} : ${data['amount']}');
-          }).toList(),
-        ]
-      )
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            ...groupedTransactionValues.map(
+              (data) {
+                return Flexible(
+                  fit: FlexFit.tight,
+                  child: ChartBar(
+                      data['day'],
+                      data['amount'],
+                      totalSpending == 0.0
+                          ? 0.0
+                          : (data['amount'] as double) / totalSpending),
+                );
+              },
+            ).toList(),
+          ],
+        ),
+      ),
     );
   }
 }
