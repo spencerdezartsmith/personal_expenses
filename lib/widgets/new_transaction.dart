@@ -6,16 +6,45 @@ import '../widgets/adaptive_button.dart';
 class NewTransaction extends StatefulWidget {
   final Function addNewTransaction;
 
-  NewTransaction(this.addNewTransaction);
+  NewTransaction(this.addNewTransaction) {
+    print('Constructor New Transaction called');
+  }
 
   @override
-  _NewTransactionState createState() => _NewTransactionState();
+  _NewTransactionState createState() {
+    print('Create State in NewTranstion called');
+    return _NewTransactionState();
+  }
 }
 
 class _NewTransactionState extends State<NewTransaction> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime _selectedDate;
+
+  _NewTransactionState() {
+    print('Constructor NewTransactionState called');
+  }
+
+  @override
+  void initState() {
+    // HTTP request to load some data
+    print('initState()');
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(NewTransaction oldWidget) {
+    // widget would be able to be called referencing the new widget
+    print('didUpdateWidget()');
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    print('dispose()');
+    super.dispose();
+  }
 
   void _submitData() {
     final enteredTitle = _titleController.text;
@@ -92,7 +121,7 @@ class _NewTransactionState extends State<NewTransaction> {
               color: Theme.of(context).primaryColor,
               textColor: Colors.white,
               onPressed: _submitData,
-              child: Text('Add Transaction'),
+              child: const Text('Add Transaction'),
             )
           ],
         ),
